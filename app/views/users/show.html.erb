@@ -1,0 +1,38 @@
+<h1>MyPage for <%= @user.fullname %></h1>
+
+<% if @students != nil %>
+  <p>
+    <% @students.each {|st|
+       color = @updated_users.include?(st.id) ? 'btn btn-warning' : 'btn btn-light' %>
+      <%= link_to st.fullname, user_path(st.id), class: color %>
+    <% } %>
+  </p>
+<% end %>
+
+<div class="form-group">
+  <%= form_with model: Post.new do |f| %>
+    <%= f.text_area :body, placeholder: "Add your comment", class: 'form-control', rows: 10  %>
+    <%= f.hidden_field :id, { value: @user.id } %>
+    <%= f.submit 'submit', class: 'btn btn-primary' %>
+  <% end %>
+</div>
+
+<% if @posts != nil %>
+  <% l = @posts.length; @posts.each_with_index {|post, i| 
+    submitter = User.find_by(id: post.submitter)
+    sname = (submitter != nil) ? submitter.fullname : 'Anonymous' %>
+    <div class="card">
+      <div class="card-header">
+        <%= (l-i).to_s + " : " %>
+        <%= (submitter != nil) ? (link_to sname, user_path(submitter)) : sname %>
+        <%= post.created_at.to_s %>
+      </div>
+      <div class="card-body">
+        <%= simple_format(h(post.body)) %>
+      </div>
+    </div>
+  <% } %>
+  <br />
+  <%= paginate @posts %>
+  <br />
+<% end %>
